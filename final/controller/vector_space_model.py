@@ -3,7 +3,7 @@ import ir_file as ir_f
 import math
 import os
 import copy
-#import pyodbc
+# import pyodbc
 from time import gmtime, strftime
 
 
@@ -44,6 +44,9 @@ def calDocumantRank(doc_word_count, folder_word_count_distinct, query_word_count
     k1 = 10.0
     k3 = 3.0
 
+    b = 0.3
+    bs = 0.75  # tw-idf(bm25)
+
     # tf(i,j) document tf
     for (fn, d) in d_tf.items():
         for (word, count) in d.items():
@@ -65,6 +68,13 @@ def calDocumantRank(doc_word_count, folder_word_count_distinct, query_word_count
                 d[word] = (e + (1 - e) * float(count / d_max))
             elif (d_tf_c == 6):  # sm25
                 d[word] = (k1 + 1) * (tfp[fn])[word] / (k1 + (tfp[fn])[word])
+            elif (d_tf_c == 7):  # tw-idf(tf-idf)
+                d_sum = sum(list(d.values()))
+                d[word] = (1 + math.log(1 + math.log(count))) / ((1 - b) + b * d_sum / d_avg_len)
+            elif (d_tf_c == 8):  # tw-idf(bm25)
+                d_sum = sum(list(d.values()))
+                K = k1 * ((1 - bs) + bs * d_sum / d_avg_len)
+                d[word] = ((k1 + 1) * count) / (K + count)
 
     # for (fn, d) in d_tf.items():
     #     for (word, count) in d.items():
@@ -94,11 +104,11 @@ def calDocumantRank(doc_word_count, folder_word_count_distinct, query_word_count
     # idf(i,j)
     log_d_n = {}
     for (word, count) in d_n.items():
-        #print(word, count)
+        # print(word, count)
         if d_idf_c == 1:
             log_d_n[word] = 1
         elif d_idf_c == 2:
-            log_d_n[word] = math.log(float(N / count), 10)
+            log_d_n[word] = math.log(float(N + 1 / count), 10)
         elif d_idf_c == 3:
             log_d_n[word] = math.log(1 + float(N / count), 10)
         elif d_idf_c == 4:
@@ -218,7 +228,8 @@ def calDocumantRank(doc_word_count, folder_word_count_distinct, query_word_count
     # print(sorted(dict(sim_q['20002.query']).items(), key=lambda x: x[1], reverse=True))
     return sim_q
 
-def outputfile(sim_q,is_hw01,po,d_tf_c, q_tf_c, d_idf_c, q_idf_c, qr_c):
+
+def outputfile(sim_q, is_hw01, po, d_tf_c, q_tf_c, d_idf_c, q_idf_c, qr_c):
     '''
      ouput origin(document, ranking)
     '''
@@ -257,17 +268,18 @@ def outputfile(sim_q,is_hw01,po,d_tf_c, q_tf_c, d_idf_c, q_idf_c, qr_c):
             f.writelines(a)
         f.close()
 
-def Rocchio(sim_q, query_word_count,doc_word_count,R,A,B):
-    q_pl={}
+
+def Rocchio(sim_q, query_word_count, doc_word_count, R, A, B):
+    q_pl = {}
     for q, docs in sim_q.items():
         dc_temp = docs[:R]
         q_temp = query_word_count[q].copy()
-        #print q,q_temp
+        # print q,q_temp
 
         # cal query weight
-        for w,c in q_temp.items():
+        for w, c in q_temp.items():
             q_temp[w] = c * A
-            #print q,w,c,q_temp[w]
+            # print q,w,c,q_temp[w]
 
         d_temp = {}
         # cal document weight
@@ -276,11 +288,11 @@ def Rocchio(sim_q, query_word_count,doc_word_count,R,A,B):
             d_temp[doc] = doc_word_count[doc].copy()
             for w, c in d_temp[doc].items():
                 d_temp[doc][w] = c * B_div_R
-            #print q,doc
+                # print q,doc
 
-        #combine
+        # combine
         for d, d_words in d_temp.items():
-            for d_w,d_c in d_words.items():
+            for d_w, d_c in d_words.items():
                 if d_w in q_temp:
                     q_temp[d_w] = q_temp[d_w] + d_c
                 else:
@@ -288,6 +300,7 @@ def Rocchio(sim_q, query_word_count,doc_word_count,R,A,B):
 
         q_pl[q] = q_temp
     return q_pl
+
 
 if __name__ == '__main__':
     pd = '../dataset/Document_final'
@@ -312,18 +325,17 @@ if __name__ == '__main__':
     #     print q,words
     q_w_c = copy.deepcopy(query_word_count)
     q_w_c1 = copy.deepcopy(query_word_count)
-    #q_w_c2 = copy.deepcopy(query_word_count)
+    # q_w_c2 = copy.deepcopy(query_word_count)
 
     d_w_c = copy.deepcopy(doc_word_count)
     d_w_c1 = copy.deepcopy(doc_word_count)
     d_w_c2 = copy.deepcopy(doc_word_count)
 
     d_w_c_d = copy.deepcopy(folder_word_count_distinct)
-    #d_w_c_d1 = copy.deepcopy(folder_word_count_distinct)
+    # d_w_c_d1 = copy.deepcopy(folder_word_count_distinct)
     d_w_c_d2 = copy.deepcopy(folder_word_count_distinct)
 
     sim_q = calDocumantRank(d_w_c, d_w_c_d, q_w_c, po, 6, 6, 6, 3, e, qr_c)
-    q_ro = Rocchio(sim_q,q_w_c1,d_w_c1,R_c,A,B)
+    q_ro = Rocchio(sim_q, q_w_c1, d_w_c1, R_c, A, B)
     sim_q = calDocumantRank(d_w_c2, d_w_c_d2, q_ro, po, 6, 6, 6, 3, e, qr_c)
     outputfile(sim_q, is_hw01, po, 6, 6, 6, 3, qr_c)
-

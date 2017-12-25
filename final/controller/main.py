@@ -18,13 +18,16 @@ if __name__ == '__main__':
     A = 0.5
     B = 0.5
 
-    #map & hw13 -> 2314
+    # map & hw13 -> 2314
 
-    #2422 -> 2421(10)
-    #2113 -> 2113(10) v 10 7 4
-    #2222 -> 2221(10)
-    #6661 -> 6661(10)
-    #5351 -> 5351(10)
+    # 2422 -> 2421(10)
+    # 2113 -> 2113(10) v 10 7 4
+    # 2222 -> 2221(10)
+    # 6661 -> 6661(10)
+    # 5351 -> 5351(10)
+
+    # tw-idf(tf-idf) 7621 => map@200 = 0.29728
+    # tw-idf(bm25) 8621 => map@200 = 0.31552
 
     '''
     讀取檔案
@@ -51,8 +54,10 @@ if __name__ == '__main__':
         print('(4.) (0.5 + 0.5 * (tf(i,j)/maxj(tf(i,j))))')
         print('(5.) (e + (1 - e) * (tf(i,j)/maxj(tf(i,j))))')
         print('(6.) sm25')
-        d_tf_c = int(raw_input('d_tf_c(1-6): '))
-        while (d_tf_c > 6 or d_tf_c < 1): d_tf_c = int(raw_input('try d_tf_c(1-6): '))
+        print('(7.) tw-idf(tf-idf)')
+        print('(8.) tw-idf(bm25)')
+        d_tf_c = int(raw_input('d_tf_c(1-8): '))
+        while (d_tf_c > 8 or d_tf_c < 1): d_tf_c = int(raw_input('try d_tf_c(1-8): '))
 
         # query tf
         print('2. Choose tf(i,q) method')
@@ -105,13 +110,13 @@ if __name__ == '__main__':
         # d_w_c_d1 = copy.deepcopy(folder_word_count_distinct)
         d_w_c_d2 = copy.deepcopy(folder_word_count_distinct)
 
-        sim_q = vsm.calDocumantRank(d_w_c, d_w_c_d, q_w_c, po,  d_tf_c, q_tf_c, d_idf_c,
-                            q_idf_c, e, qr_c)
+        sim_q = vsm.calDocumantRank(d_w_c, d_w_c_d, q_w_c, po, d_tf_c, q_tf_c, d_idf_c,
+                                    q_idf_c, e, qr_c)
         q_ro = vsm.Rocchio(sim_q, q_w_c1, d_w_c1, R_c, A, B)
-        sim_q = vsm.calDocumantRank(d_w_c2, d_w_c_d2, q_ro, po,  d_tf_c, q_tf_c, d_idf_c,
-                            q_idf_c, e, qr_c)
-        vsm.outputfile(sim_q, is_hw01, po,  d_tf_c, q_tf_c, d_idf_c,
-                            q_idf_c, qr_c)
+        sim_q = vsm.calDocumantRank(d_w_c2, d_w_c_d2, q_ro, po, d_tf_c, q_tf_c, d_idf_c,
+                                    q_idf_c, e, qr_c)
+        vsm.outputfile(sim_q, is_hw01, po, d_tf_c, q_tf_c, d_idf_c,
+                       q_idf_c, qr_c)
     else:
         for i in range(1, 7, 1):
             for j in range(1, 7, 1):

@@ -50,7 +50,7 @@ def ReadFolder(p, start_index):
     # read all files in the folder
     for fn in files_name:
         fullpath = os.path.join(p, fn)
-        if(fn == '.DS_Store'): continue
+        if (fn == '.DS_Store'): continue
         document_info, word_counter, document_word_count = ReadFile(fullpath, start_index)
 
         folder[fn] = word_counter
@@ -86,7 +86,6 @@ def ReadFolderDebug(po, doc_word_count, folder_word_count, folder_word_count_dis
         f.close()
 
 
-
 def ReadEvaFile(path, start_index):
     ds = []
 
@@ -96,6 +95,7 @@ def ReadEvaFile(path, start_index):
         ds.append(ws[0])
 
     return ds
+
 
 def ReadEvaFolder(p, start_index):
     folder = {}
@@ -112,13 +112,14 @@ def ReadEvaFolder(p, start_index):
     # read all files in the folder
     for fn in files_name:
         fullpath = os.path.join(p, fn)
-        if(fn == '.DS_Store'): continue
+        if (fn == '.DS_Store'): continue
         ds = ReadEvaFile(fullpath, start_index)
 
         folder[fn] = ds
         # debug
         # if debug: ReadFileDebug(document_info, word_counter)
     return folder
+
 
 if __name__ == '__main__':
     debug1 = False
