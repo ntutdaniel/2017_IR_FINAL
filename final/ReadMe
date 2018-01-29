@@ -1,0 +1,11 @@
+此為該程式的說明文件
+1. 該程式為twidf的比較對象程式碼分別為tf-idf及bm25
+2. 如何執行該程式方法如下
+    a. 進入controller資料夾
+    b. 執行 python main.py
+    c. 根據終端機問題輸入選項
+        i. tf-idf => n -> 200 -> 7 -> 6 -> 2 -> 1
+        ii. bm25 => n -> 200 -> 8 -> 6 -> 2 -> 1
+    d. 生成結果在dataset/Output/R_QD資料夾
+        i. tf-idf => 7_6_2_1_hw01_answer
+        ii. bm25 => 8_6_2_1_hw01_answer
